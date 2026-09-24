@@ -1,5 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
+
 import Input from "../components/Input";
+import { registerUser } from "../services/authService";
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -18,14 +20,27 @@ function RegisterPage() {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear the error for the specific field when the user starts typing
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
   };
 
   const validate = (): boolean => {
     let isValid = true;
-    const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
+
+    const newErrors = {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
 
     // Name validation
     if (!formData.name.trim()) {
@@ -61,24 +76,55 @@ function RegisterPage() {
     }
 
     setErrors(newErrors);
+
     return isValid;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
-    if (validate()) {
-      // TASK 23/24: API Call will go here later
-      console.log("Register Validation Passed! Form Data:", formData);
-      alert("Validation passed! Ready for API integration.");
+
+    if (!validate()) {
+      return;
+    }
+
+    try {
+      const result = await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      console.log("Registration successful:", result);
+
+      alert("Registration successful!");
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.error("Registration failed:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Registration failed. Please try again."
+      );
     }
   };
 
   return (
     <div className="flex min-h-[calc(100vh-73px)] items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <h1 className="mb-2 text-3xl font-bold sm:text-4xl">Create Account</h1>
-        <p className="mb-8 text-gray-600">Create your MockInterview account</p>
+        <h1 className="mb-2 text-3xl font-bold sm:text-4xl">
+          Create Account
+        </h1>
+
+        <p className="mb-8 text-gray-600">
+          Create your MockInterview account
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div>
@@ -90,8 +136,11 @@ function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your name"
             />
+
             {errors.name && (
-              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.name}
+              </p>
             )}
           </div>
 
@@ -104,8 +153,11 @@ function RegisterPage() {
               onChange={handleChange}
               placeholder="Enter your email"
             />
+
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.email}
+              </p>
             )}
           </div>
 
@@ -118,8 +170,11 @@ function RegisterPage() {
               onChange={handleChange}
               placeholder="Create a password"
             />
+
             {errors.password && (
-              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.password}
+              </p>
             )}
           </div>
 
@@ -132,8 +187,11 @@ function RegisterPage() {
               onChange={handleChange}
               placeholder="Confirm your password"
             />
+
             {errors.confirmPassword && (
-              <p className="mt-1 text-sm text-red-500">{errors.confirmPassword}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
 

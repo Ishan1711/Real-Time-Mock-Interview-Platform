@@ -1,10 +1,35 @@
 import { Router } from "express";
+
 import { sendSuccess } from "../utils/response.js";
+import db from "../config/db.js";
+import { register } from "../controllers/auth.controller.js";
 
 const router = Router();
 
 router.get("/health", (req, res) => {
   return sendSuccess(res, "Server is healthy");
 });
+
+router.get("/db-test", async (req, res) => {
+  try {
+    const plan = db.sql.public.user
+      .select("id")
+      .limit(1)
+      .build();
+
+    const result = await db.runtime().query(plan);
+
+    return sendSuccess(res, "Database connection is working", result);
+  } catch (error) {
+    console.error("Database connection failed:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Database connection failed",
+    });
+  }
+});
+
+router.post("/auth/register", register);
 
 export default router;
