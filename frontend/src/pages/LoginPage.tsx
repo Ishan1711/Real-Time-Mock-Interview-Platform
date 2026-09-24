@@ -1,4 +1,5 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 
 import Input from "../components/Input";
 import { loginUser } from "../services/authService";
@@ -73,6 +74,9 @@ function LoginPage() {
       });
 
       console.log("Login successful:", result);
+
+      // Store JWT token for protected routes
+      localStorage.setItem("token", result.data.token);
 
       alert("Login successful!");
     } catch (error) {
