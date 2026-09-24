@@ -2,10 +2,13 @@ import { Router } from "express";
 
 import { sendSuccess } from "../utils/response.js";
 import db from "../config/db.js";
+
 import {
   register,
   login,
 } from "../controllers/auth.controller.js";
+
+import { authenticateToken } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -22,7 +25,11 @@ router.get("/db-test", async (req, res) => {
 
     const result = await db.runtime().query(plan);
 
-    return sendSuccess(res, "Database connection is working", result);
+    return sendSuccess(
+      res,
+      "Database connection is working",
+      result
+    );
   } catch (error) {
     console.error("Database connection failed:", error);
 
@@ -34,6 +41,20 @@ router.get("/db-test", async (req, res) => {
 });
 
 router.post("/auth/register", register);
+
 router.post("/auth/login", login);
+
+// Protected test endpoint
+router.get(
+  "/auth/protected",
+  authenticateToken,
+  (req, res) => {
+    return res.status(200).json({
+      success: true,
+      message: "Protected route accessed successfully",
+      user: res.locals.user,
+    });
+  }
+);
 
 export default router;
