@@ -1,0 +1,47 @@
+model User {
+  id           Int         @id @default(autoincrement())
+  name         String
+  email        String      @unique
+  passwordHash String
+  createdAt    DateTime    @default(now())
+  updatedAt DateTime
+
+  interviews   Interview[]
+}
+
+model Interview {
+  id          Int        @id @default(autoincrement())
+  userId      Int
+  role        String
+  type        String
+  difficulty  String
+  status      String     @default("PENDING")
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+
+  user        User       @relation(fields:[userId], references:[id])
+  questions   Question[]
+}
+
+model Question {
+  id          Int       @id @default(autoincrement())
+  interviewId Int
+  topic       String
+  text        String
+  difficulty  String
+  order       Int
+
+  interview   Interview @relation(fields:[interviewId], references:[id])
+  answers     Answer[]
+}
+
+model Answer {
+  id          Int      @id @default(autoincrement())
+  questionId  Int
+  text        String
+  submittedAt DateTime @default(now())
+  score       Float?
+
+  question    Question @relation(fields:[questionId], references:[id])
+}
