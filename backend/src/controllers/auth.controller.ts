@@ -5,6 +5,8 @@ import {
   loginUser,
 } from "../services/auth.service.js";
 
+import { generateToken } from "../utils/jwt.js";
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
@@ -54,10 +56,15 @@ export const login = async (req: Request, res: Response) => {
       password,
     });
 
+    const token = generateToken(user.id);
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      data: user,
+      data: {
+        user,
+        token,
+      },
     });
   } catch (error) {
     console.error("Login failed:", error);
