@@ -2,7 +2,10 @@ import { Router } from "express";
 
 import { sendSuccess } from "../utils/response.js";
 import db from "../config/db.js";
-import { register } from "../controllers/auth.controller.js";
+import {
+  register,
+  login,
+} from "../controllers/auth.controller.js";
 
 const router = Router();
 
@@ -31,5 +34,6 @@ router.get("/db-test", async (req, res) => {
 });
 
 router.post("/auth/register", register);
+router.post("/auth/login", login);
 
 export default router;
