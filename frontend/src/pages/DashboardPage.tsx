@@ -1,4 +1,31 @@
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "../services/authService";
+
+interface CurrentUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
 function DashboardPage() {
+  const [user, setUser] = useState<CurrentUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const result = await getCurrentUser();
+        setUser(result.data);
+      } catch (error) {
+        console.error("Failed to fetch current user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="mx-auto max-w-7xl">
@@ -10,7 +37,9 @@ function DashboardPage() {
             </h1>
 
             <p className="mt-1 text-gray-600">
-              Welcome to your Mock Interview Dashboard.
+              {loading
+                ? "Loading your profile..."
+                : `Welcome, ${user?.name || "User"}!`}
             </p>
           </div>
 

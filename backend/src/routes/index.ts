@@ -6,6 +6,7 @@ import db from "../config/db.js";
 import {
   register,
   login,
+  getMe,
 } from "../controllers/auth.controller.js";
 
 import { authenticateToken } from "../middleware/auth.middleware.js";
@@ -43,6 +44,13 @@ router.get("/db-test", async (req, res) => {
 router.post("/auth/register", register);
 
 router.post("/auth/login", login);
+
+// Current authenticated user
+router.get(
+  "/auth/me",
+  authenticateToken,
+  getMe
+);
 
 // Protected test endpoint
 router.get(

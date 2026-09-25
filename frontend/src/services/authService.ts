@@ -46,3 +46,26 @@ export const loginUser = async (data: LoginData) => {
 
   return result;
 };
+
+export const getCurrentUser = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    throw new Error("Authentication token not found");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || "Failed to fetch current user");
+  }
+
+  return result;
+};

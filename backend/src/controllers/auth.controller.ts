@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import {
   registerUser,
   loginUser,
+  getCurrentUser,
 } from "../services/auth.service.js";
 
 import { generateToken } from "../utils/jwt.js";
@@ -73,6 +74,37 @@ export const login = async (req: Request, res: Response) => {
       success: false,
       message:
         error instanceof Error ? error.message : "Login failed",
+    });
+  }
+};
+
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const userId = res.locals.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const user = await getCurrentUser(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Current user fetched successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.error("Fetching current user failed:", error);
+
+    return res.status(404).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch current user",
     });
   }
 };
